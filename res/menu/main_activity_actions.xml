@@ -1,0 +1,13 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/action_flip"
+        android:icon="@drawable/flip"  
+        android:title="@string/flip_button"
+        android:showAsAction="always"/>
+    <item
+        android:id="@+id/action_settings"
+        android:title="@string/action_settings"
+        android:showAsAction="always"/>
+    
+</menu>
