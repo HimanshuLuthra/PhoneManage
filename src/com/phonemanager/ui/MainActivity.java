@@ -1,6 +1,8 @@
 package com.phonemanager.ui;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -9,6 +11,8 @@ import java.util.Map;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -22,7 +26,6 @@ import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.phonemanager.R;
 import com.phonemanager.service.ActivityDataPair;
@@ -86,21 +89,22 @@ public class MainActivity extends Activity implements ServiceConnection,
 		mainPagerAdapterGraph = new GraphPagerAdapter(this);
 		mainPager = (ViewPager) findViewById(R.id.main_pager);
 		mainPager.setDrawingCacheEnabled(true);
-		mainPager.setOffscreenPageLimit(3);
+		mainPager.setOffscreenPageLimit(PMConstants.MAIN_PAGE_ADAPTER_COUNT);
 		mainPager.setOnPageChangeListener(this);
 		// PagerTabStrip pagerTitleStrip = (PagerTabStrip)
 		// findViewById(R.id.pager_title_strip);
 		pagerState = PagerState.LIST_STATE;
-		/*
-		 * if (savedInstanceState != null) pagerState =
-		 * PagerState.getValue((Integer) savedInstanceState
-		 * .get(PMConstants.PAGER_STATE_RESTORE));
-		 */
+		
+	/*	  if (savedInstanceState != null) pagerState =
+		  PagerState.getValue((Integer) savedInstanceState
+		  .get(PMConstants.PAGER_STATE_RESTORE));*/
+		 
 
 		if (pagerState == PagerState.LIST_STATE)
 			mainPager.setAdapter(mainPagerAdapterList);
 		else
 			mainPager.setAdapter(mainPagerAdapterGraph);
+	
 	}
 
 	@Override
@@ -157,6 +161,20 @@ public class MainActivity extends Activity implements ServiceConnection,
 			buildMap();
 		}
 		isDataReadOnCreate = false;
+		//setAlarm();
+	}
+	private void setAlarm(){
+		Intent mIntent = new Intent(this,
+				com.phonemanager.service.LogService.class);
+		mIntent.putExtra("noti", true);
+		PendingIntent mPendingIntent = PendingIntent.getService(getApplicationContext(),0, mIntent,0);
+		Calendar c2 = new GregorianCalendar();
+		c2.set(Calendar.HOUR_OF_DAY,23);
+		c2.set(Calendar.MINUTE, 59);
+		c2.set(Calendar.DATE, c2.get(Calendar.DATE));
+		c2.set(Calendar.MONTH, c2.get(Calendar.MONTH));
+		AlarmManager am = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+		am.setRepeating(AlarmManager.RTC_WAKEUP, Util.getTimeSlotStart(Util.DAILY),Util.notificationRepetionTime, mPendingIntent);
 	}
 
 	@Override
@@ -174,7 +192,7 @@ public class MainActivity extends Activity implements ServiceConnection,
 	@Override
 	public void onDestroy() {
 		Log.d(TAG, "Test1 onDestroy");
-		timeMap.clear();
+		//timeMap.clear();
 		super.onDestroy();
 		unbindService(this);
 	}
@@ -261,6 +279,7 @@ public class MainActivity extends Activity implements ServiceConnection,
 			
 	}
 
+	
 	@Override
 	public void onPageScrollStateChanged(int arg0) {
 	}
@@ -288,10 +307,8 @@ public class MainActivity extends Activity implements ServiceConnection,
 		public int getValue() {
 			return this.value;
 		}
-
 	}
 
-	
 	private void rejectPackages() {
 		rejectedPackageList.add("com.android.systemui");
 		//TODO: to add more package names 

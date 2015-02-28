@@ -14,6 +14,7 @@ public class RowItem {
 	private String activity;
 	private Drawable icon;
 	private String packageName;
+	private String timeToDisplay;
 
 	public RowItem(Context context, String activity, Long time) {
 		this.context = context;
@@ -29,11 +30,29 @@ public class RowItem {
 	public String getActivity() {
 		return activity;
 	}
-
+	
 	public Long getTime() {
 		return time;
 	}
 
+	//time in seconds
+	public String getTimeInString(Long time) {
+		String finalTime = "";
+		Long hours, minutes;
+
+		hours = time / 3600;
+
+		if (hours != 0) {
+			finalTime = hours.toString();
+			finalTime = finalTime.concat("h:");
+		}
+		minutes = time % 3600;
+
+		minutes = minutes / 60;
+		finalTime = finalTime.concat(minutes.toString() + "m");
+
+		return finalTime;
+	}	
 	public Drawable getIcon() {
 		return this.icon;
 	}

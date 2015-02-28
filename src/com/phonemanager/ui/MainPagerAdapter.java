@@ -62,7 +62,7 @@ public class MainPagerAdapter extends PagerAdapter {
 	}
 
 
-	public void updateData(int position, final HashMap<String, Long> newDataMap) {
+	public void updateData(int position, HashMap<String, Long> newDataMap) {
 		AppListAdapter appAdapter = mainAdapterArray.get(position);
 		appAdapter.updatePackageList(position,newDataMap);
 	}

@@ -18,6 +18,12 @@ public class Util {
 	public static int noOfApplicationsToShowToday = 5;
 	public static int noOfApplicationsToShowWeekly = 10;
 	public static int noOfApplicationsToShowMonthly = 15;
+	public static int notificationRepetionTime = 24 * 60 * 60 * 1000;
+	public static int WEEK = 1;
+	public static int MONTH = 2;
+	public static int DAILY = 3;
+	static Calendar c = Calendar.getInstance();
+
 	public static long normaliseTime(long currentData) {
 		return (currentData / 1000L);
 	}
@@ -39,11 +45,12 @@ public class Util {
 
 	public static long getTimeSlotStart(int position) {
 		switch (position) {
-		case 1: //return week start
+		case 1: // return week start
 			return (((new Date()).getTime()) / 86400000L) * 86400000L - 7 * 86400000L;
-		case 2: //return month start
-			return (((new Date()).getTime()) / 86400000L) * 86400000L - 30 * 86400000L;
-		default: //by default return day start
+		case 2: // return month start
+			return (((new Date()).getTime()) / 86400000L) * 86400000L
+					- c.getActualMaximum(Calendar.DAY_OF_MONTH) * 86400000L;
+		default: // by default return day start
 			return (((new Date()).getTime()) / 86400000L) * 86400000L;
 		}
 	}

@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.phonemanager.R;
+import com.phonemanager.service.PMConstants;
 
 public class AppListAdapter extends ArrayAdapter<RowItem> {
 	private final Context context;
@@ -46,9 +47,9 @@ public class AppListAdapter extends ArrayAdapter<RowItem> {
 		}
 		if (packageList == null)
 			packageList = new ArrayList<RowItem>();
-		if (itemsToShow == null)
+		if (itemsToShow == null){
 			itemsToShow = new ArrayList<RowItem>();
-
+		}
 		boolean modificationFlag = false;
 		HashMap<String, Long> newDataMapCopy = new HashMap<String, Long>(
 				newDataMap);
@@ -58,7 +59,7 @@ public class AppListAdapter extends ArrayAdapter<RowItem> {
 			String key = packageList.get(i).getPackageName();
 			Long value = packageList.get(i).getTime();
 			Log.d("TEST:::", "packageList.get(i) "
-					+ packageList.get(i).getPackageName());
+					+ packageList.get(i).getPackageName()+"time is "+value);
 			if (key.equals(Util.getPackageToRemoveName())) {
 				Log.d("TEST:::",
 						"REMOVED PACKAGE IS " + Util.getPackageToRemoveName());
@@ -86,16 +87,18 @@ public class AppListAdapter extends ArrayAdapter<RowItem> {
 
 			if (item.setActivity((String) dataPair.getKey())) {
 				item.setTime((Long) dataPair.getValue());
-
-				packageList.add(item);
+				Log.d("Test::::::","time is "+dataPair.getValue());
+				if(dataPair.getValue()>PMConstants.MINIMUM_TIME_FOR_DISPLAY_IN_SECONDS){
+					packageList.add(item);	
+				}
 			}
 		}
 
 		if (modificationFlag) {
 			Collections.sort(packageList, mComparator);
-			cutdata();
+			//cutdata();
 			notifyDataSetChanged();
-			return;
+			//return;
 		}
 		cutdata();
 
@@ -103,8 +106,9 @@ public class AppListAdapter extends ArrayAdapter<RowItem> {
 
 	private void cutdata() {
 		itemsToShow.clear();
-		for (int i = 0; i < getApplicationShowSize() && i<packageList.size(); i++)
+		for (int i = 0; i < getApplicationShowSize() && i<packageList.size(); i++){
 			itemsToShow.add(packageList.get(i));
+		}
 	}
 
 	private int getApplicationShowSize() {
@@ -139,12 +143,12 @@ public class AppListAdapter extends ArrayAdapter<RowItem> {
 			holder = (AppRecordHolder) row.getTag();
 		}
 
-		// RowItem packageObject = packageList.get(position);
-		RowItem packageObject = itemsToShow.get(position);
+		 RowItem packageObject = packageList.get(position);
+		//RowItem packageObject = itemsToShow.get(position);
 
 		holder.appName.setText(packageObject.getActivity());
-		holder.appRunTime.setText("" + packageObject.getTime());
-
+		//holder.appRunTime.setText("" + packageObject.getTime());
+		holder.appRunTime.setText(packageObject.getTimeInString(packageObject.getTime()));
 		holder.appIcon.setImageDrawable(packageObject.getIcon());
 
 		return row;
@@ -158,24 +162,11 @@ public class AppListAdapter extends ArrayAdapter<RowItem> {
 
 	@Override
 	public int getCount() {
-		// return packageList == null ? 0 : packageList.size();
+		if(itemsToShow==null)
+		Log.d("Himanshu ","itemstoshow is null");
+		else
+		Log.d("Himanshu "," itemsToShow is not null ");
 		return itemsToShow == null ? 0 : itemsToShow.size();
-	}
-
-	public String convertTime(Long time) {
-		String finalTime;
-		Long hours, minutes;
-
-		time = time / 1000;
-		hours = time / 3600;
-		finalTime = hours.toString();
-		finalTime = finalTime.concat("h:");
-		minutes = time % 3600;
-
-		minutes = minutes / 60;
-		finalTime = finalTime.concat(minutes.toString() + "m");
-
-		return finalTime;
 	}
 
 	class RowItemComparator implements Comparator<Object> {
